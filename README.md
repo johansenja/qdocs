@@ -44,6 +44,7 @@ $ qdocs 'Set#length'
 
 #### Server usage:
 `$ qdocs --server` or with Rails: `$ bundle exec rails runner 'require "qdocs/server"'`
+
 `$ curl 'http://localhost:8080/?input=User%2Efind'` 
 
 ## Development
