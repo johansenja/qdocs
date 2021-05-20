@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'qdocs'
+require 'json'
+
+input = ARGV[0]
+
+output = nil
+
+case input
+when "--version", "-v", "-version"
+  puts Qdocs::VERSION
+when "-s", "--server"
+  require "qdocs/server"
+when "help", "--help", "-h", "", nil
+  puts <<~STR
+    Usage:
+      qdocs 'String#split' # => info about String's "split" instance method
+      qdocs 'String.try_convert' # => info about String's "try_convert" singleton method
+      qdocs puts # => info about Object/Kernel method
+      qdocs String # => info about String class
+      qdocs String/tr/ # => grep for methods matching /tr/ within String
+  STR
+else
+  begin
+    output = Qdocs.lookup(input)
+  rescue => e
+    abort e.message
+  end
+end
+
+puts JSON.pretty_generate(output) if output
