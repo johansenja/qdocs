@@ -22,7 +22,29 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Example
+
+```
+$ qdocs 'Set#length'
+{
+  "defined_at": "~/.rvm/rubies/ruby-2.7.1/lib/ruby/2.7.0/set.rb:151",
+  "source": "def size\n  @hash.size\nend\n",
+  "arity": 0,
+  "parameters": {
+  },
+  "comment": "# Returns the number of elements.",
+  "name": "length",
+  "belongs_to": "Set",
+  "super_method": null
+}
+```
+
+#### Further usage examples:
+`$ qdocs --help`
+
+#### Server usage:
+`$ qdocs --server` or with Rails: `$ bundle exec rails runner 'require "qdocs/server"'`
+`$ curl 'http://localhost:8080/?input=User%2Efind'` 
 
 ## Development
 
