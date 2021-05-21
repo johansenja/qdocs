@@ -57,7 +57,7 @@ module Qdocs
     class Method < Qdocs::Base::Method
       include ActiveRecord::Helpers
 
-      def index(pattern)
+      def index(const, pattern)
         database_attributes = {}
         attrs = super do |constant|
           if_active_record(constant) do |klass|
