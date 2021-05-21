@@ -1,10 +1,10 @@
 module Qdocs
   module ActiveRecord
     module Helpers
-      def active_record_columns_for(constant, name)
+      def active_record_column_for(constant, name)
         name = name.to_sym
         col_attrs = constant.column_for_attribute(name)
-        if col_attrs.is_a? ActiveRecord::ConnectionAdapters::NullColumn
+        if col_attrs.is_a? ::ActiveRecord::ConnectionAdapters::NullColumn
           raise UnknownMethodError, "Unknown attribute #{name} for #{constant}"
         end
 
