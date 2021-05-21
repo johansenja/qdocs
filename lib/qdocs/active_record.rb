@@ -1,7 +1,31 @@
 module Qdocs
   module ActiveRecord
+    module Helpers
+      def active_record_columns_for(constant, name)
+        name = name.to_sym
+        col_attrs = constant.column_for_attribute(name)
+        if col_attrs.is_a? ActiveRecord::ConnectionAdapters::NullColumn
+          raise UnknownMethodError, "Unknown attribute #{name} for #{constant}"
+        end
+
+        {
+          type: col_attrs.sql_type_metadata.type,
+          comment: col_attrs.comment,
+          default: col_attrs.default,
+          null: col_attrs.null,
+          default_function: col_attrs.default_function,
+        }
+      end
+
+      def if_active_record(constant)
+        if Object.const_defined?("ActiveRecord::Base") && constant < ActiveRecord::Base
+          yield constant
+        end
+      end
+    end
+
     class Const < Qdocs::Base::Const
-      include Helpers
+      include ActiveRecord::Helpers
 
       def show(const)
         database_attributes = {}
@@ -31,7 +55,7 @@ module Qdocs
     end
 
     class Method < Qdocs::Base::Method
-      include Helpers
+      include ActiveRecord::Helpers
 
       def index(pattern)
         database_attributes = {}
@@ -56,37 +80,11 @@ module Qdocs
           constant = klass
         end
       rescue NameError => e
-        if constant && meth && type == :instance
-          if_active_record(constant) do |klass|
-            m = meth.is_a?(Method) ? (meth.name rescue nil) : meth
-            render_response(klass, :active_record_attribute, active_record_column_for(klass, m))
-          end
-        else
-          raise e
-        end
-      end
-    end
+        raise e unless constant && meth && type == :instance
 
-    module Helpers
-      def active_record_columns_for(constant, name)
-        name = name.to_sym
-        col_attrs = constant.column_for_attribute(name)
-        if col_attrs.is_a? ActiveRecord::ConnectionAdapters::NullColumn
-          raise UnknownMethodError, "Unknown attribute #{name} for #{constant}"
-        end
-
-        {
-          type: col_attrs.sql_type_metadata.type,
-          comment: col_attrs.comment,
-          default: col_attrs.default,
-          null: col_attrs.null,
-          default_function: col_attrs.default_function,
-        }
-      end
-
-      def if_active_record(constant)
-        if Object.const_defined?("ActiveRecord::Base") && constant < ActiveRecord::Base
-          yield constant
+        if_active_record(constant) do |klass|
+          m = meth.is_a?(Method) ? (meth.name rescue nil) : meth
+          render_response(klass, :active_record_attribute, active_record_column_for(klass, m))
         end
       end
     end

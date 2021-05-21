@@ -108,7 +108,7 @@ module Qdocs
                    begin
                      constant.send method_method, meth
                    rescue NameError
-                     raise UnknownMethodError, "No method #{meth.inspect} for #{constant.inspect}. Did you mean #{constant.inspect}/#{meth}/ ?"
+                     raise UnknownMethodError, "No method #{meth.inspect} for #{constant}. Did you mean #{constant}/#{meth}/ ?"
                    end
                  when Method
                    meth
