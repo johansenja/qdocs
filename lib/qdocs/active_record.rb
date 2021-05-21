@@ -80,6 +80,7 @@ module Qdocs
           constant << klass
         end
       rescue UnknownMethodError => e
+        p constant, meth, type
         if constant[0] && meth && type == :instance
           if_active_record(constant[0]) do |klass|
             m = meth.is_a?(Method) ? (meth.name rescue nil) : meth
