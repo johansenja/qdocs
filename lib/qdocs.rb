@@ -136,7 +136,7 @@ module Qdocs
           comment: (method.comment.strip rescue nil),
           name: method.name,
           belongs_to: method.owner,
-          super_method: method.super_method,
+          super_method: method.super_method ? Handler::Method.new.show(method.super_method) : nil,
         })
       end
     end
