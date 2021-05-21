@@ -18,7 +18,7 @@ module Qdocs
       end
 
       def if_active_record(constant)
-        if Object.const_defined?("ActiveRecord::Base") && constant < ActiveRecord::Base
+        if Object.const_defined?("::ActiveRecord::Base") && constant < ::ActiveRecord::Base
           yield constant
         end
       end
