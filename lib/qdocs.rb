@@ -127,6 +127,7 @@ module Qdocs
                    indent_amount = first_line.length - first_line.sub(/^\s*/, '').length
                    lines.map { |l| l[indent_amount..-1] }.join
                  end
+        sup = method.super_method
 
         render_response(constant, method_method, {
           defined_at: source_location_to_str(method.source_location),
@@ -136,7 +137,7 @@ module Qdocs
           comment: (method.comment.strip rescue nil),
           name: method.name,
           belongs_to: method.owner,
-          super_method: method.super_method ? Handler::Method.new.show(method.super_method) : nil,
+          super_method: sup ? Handler::Method.new.show(sup.owner, sup, type) : nil,
         })
       end
     end
