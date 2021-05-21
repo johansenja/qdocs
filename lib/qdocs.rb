@@ -2,6 +2,7 @@
 
 require 'method_source'
 require_relative "qdocs/version"
+require "pathname"
 
 module Qdocs
   class UnknownClassError < StandardError; end
@@ -169,4 +170,21 @@ module Qdocs
       raise UnknownPatternError, "Unrecognised pattern #{input}"
     end
   end
+
+  def self.load_env(dir_level = nil)
+    check_dir = dir_level || ["."]
+    project_top_level = Pathname(File.join(*check_dir, "Gemfile")).exist? ||
+      Pathname(File.join(*check_dir, ".git")).exist?
+    if project_top_level && Pathname(File.join(*check_dir, "config", "environment.rb")).exist?
+      require File.join(*check_dir, "config", "environment.rb")
+    elsif project_top_level
+      # no op - no env to load
+    else
+      dir_level ||= []
+      dir_level << ".."
+      Qdocs.load_env(dir_level)
+    end
+  end
+
+  load_env
 end

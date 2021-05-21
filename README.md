@@ -27,15 +27,46 @@ Or install it yourself as:
 ```
 $ qdocs 'Set#length'
 {
-  "defined_at": "~/.rvm/rubies/ruby-2.7.1/lib/ruby/2.7.0/set.rb:151",
-  "source": "def size\n  @hash.size\nend\n",
-  "arity": 0,
-  "parameters": {
+  "constant": {
+    "name": "Set",
+    "type": "Class"
   },
-  "comment": "# Returns the number of elements.",
-  "name": "length",
-  "belongs_to": "Set",
-  "super_method": null
+  "query_type": "instance_method",
+  "attributes": {
+    "defined_at": "/Users/josephjohansen/.rvm/rubies/ruby-2.7.1/lib/ruby/2.7.0/set.rb:151",
+    "source": "def size\n  @hash.size\nend\n",
+    "arity": 0,
+    "parameters": {
+    },
+    "comment": "# Returns the number of elements.",
+    "name": "length",
+    "belongs_to": "Set",
+    "super_method": null
+  }
+}
+```
+**also provides support for constants which are recognised to be ActiveRecord models:**
+
+```
+$ curl 'http://localhost:7593/?input=User%2Femail%2F'
+{
+  "constant": {
+    "name": "User",
+    "type": "Class"
+  },
+  "query_type": "methods",
+  "attributes": {
+    "constant": "User",
+    "singleton_methods": [
+      "find_by_unconfirmed_email_with_errors"
+    ],
+    "instance_methods": [
+      "postpone_email_change?",
+      "postpone_email_change_until_confirmation_and_regenerate_confirmation_token",
+      "send_email_changed_notification?",
+      "send_verification_email"
+    ]
+  }
 }
 ```
 
@@ -43,9 +74,9 @@ $ qdocs 'Set#length'
 `$ qdocs --help`
 
 #### Server usage:
-`$ qdocs --server` or with Rails: `$ bundle exec rails runner 'require "qdocs/server"'`
+`$ qdocs --server`
 
-`$ curl 'http://localhost:8080/?input=User%2Efind'` 
+`$ curl 'http://localhost:7593/?input=User%2Efind'`
 
 ## Development
 
