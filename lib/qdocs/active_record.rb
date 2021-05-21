@@ -1,19 +1,17 @@
 module Qdocs
   module ActiveRecord
     module Helpers
-      def active_record_column_for(constant, name)
-        name = name.to_sym
-        col_attrs = constant.column_for_attribute(name)
-        if col_attrs.is_a? ::ActiveRecord::ConnectionAdapters::NullColumn
-          raise UnknownMethodError, "Unknown attribute #{name} for #{constant}"
+      def active_record_attributes_for(col)
+        if col.is_a? ::ActiveRecord::ConnectionAdapters::NullColumn
+          raise UnknownMethodError, "Unknown attribute #{col.name}"
         end
 
         {
-          type: col_attrs.sql_type_metadata.type,
-          comment: col_attrs.comment,
-          default: col_attrs.default,
-          null: col_attrs.null,
-          default_function: col_attrs.default_function,
+          type: col.sql_type_metadata&.type,
+          comment: col.comment,
+          default: col.default,
+          null: col.null,
+          default_function: col.default_function,
         }
       end
 
@@ -33,8 +31,8 @@ module Qdocs
         resp = super do |con|
           if_active_record(con) do |klass|
             constant = klass
-            klass.attribute_names.each do |name|
-              database_attributes[name] = active_record_column_for klass, name
+            klass.columns.each do |col|
+              active_record_attributes_for col
             end
           end
         end
@@ -61,8 +59,10 @@ module Qdocs
         database_attributes = {}
         attrs = super do |constant|
           if_active_record(constant) do |klass|
-            klass.attribute_names.grep(pattern).each do |name|
-              database_attributes[name] = active_record_column_for klass, name
+            klass.columns.each do |col|
+              next unless col.name.to_s.match? pattern
+
+              database_attributes[name] = active_attributes_for col
             end
           end
         end
@@ -75,17 +75,23 @@ module Qdocs
       end
 
       def show(const, meth, type)
-        constant = nil
+        constant = []
         super do |klass|
-          constant = klass
+          constant << klass
         end
       rescue NameError => e
-        raise e unless constant && meth && type == :instance
-
-        if_active_record(constant) do |klass|
-          m = meth.is_a?(Method) ? (meth.name rescue nil) : meth
-          render_response(klass, :active_record_attribute, active_record_column_for(klass, m))
+        if constant[0] && meth && type == :instance
+          if_active_record(constant[0]) do |klass|
+            m = meth.is_a?(Method) ? (meth.name rescue nil) : meth
+            return render_response(
+              klass,
+              :active_record_attribute,
+              active_record_attributes_for(klass.column_for_attribute(m))
+            )
+          end
         end
+
+        raise e
       end
     end
   end

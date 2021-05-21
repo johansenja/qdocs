@@ -1,5 +1,7 @@
 require "rack"
 
+# TODO: find environment.rb file if it is available, and require it
+
 module Qdocs
   class Server
     def call(env)
