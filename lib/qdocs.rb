@@ -94,6 +94,9 @@ module Qdocs
                    rescue UnknownClassError
                      abort "Unknown class #{const.inspect}"
                    end
+
+        yield constant if block_given?
+
         method = case meth
                  when Symbol, String
                    method_method = case type
