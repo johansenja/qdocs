@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'method_source'
+require "method_source"
 require_relative "qdocs/version"
 require "pathname"
 
@@ -47,10 +47,10 @@ module Qdocs
       {
         constant: {
           name: const.name,
-          type: const.class.name
+          type: const.class.name,
         },
         query_type: type,
-        attributes: attrs
+        attributes: attrs,
       }
     end
   end
@@ -90,44 +90,40 @@ module Qdocs
       end
 
       def show(const, meth, type)
-        constant = begin
-                     find_constant(const)
-                   rescue UnknownClassError
-                     abort "Unknown class #{const.inspect}"
-                   end
+        constant = find_constant(const)
 
         yield constant if block_given?
 
         method = case meth
-                 when Symbol, String
-                   method_method = case type
-                                   when :instance
-                                     :instance_method
-                                   when :singleton, :class
-                                     :method
-                                   else
-                                     raise UnknownMethodTypeError, "Unknown method type #{type}"
-                                   end
+          when Symbol, String
+            method_method = case type
+              when :instance
+                :instance_method
+              when :singleton, :class
+                :method
+              else
+                raise UnknownMethodTypeError, "Unknown method type #{type}"
+              end
 
-                   begin
-                     constant.send method_method, meth
-                   rescue NameError
-                     raise UnknownMethodError, "No method #{meth.inspect} for #{constant}. Did you mean #{constant}/#{meth}/ ?"
-                   end
-                 when ::Method
-                   meth
-                 else
-                   raise InvalidArgumentError, "#{meth.inspect} must be of type Symbol, String, or Method"
-                 end
+            begin
+              constant.send method_method, meth
+            rescue NameError
+              raise UnknownMethodError, "No method #{meth.inspect} for #{constant}. Did you mean #{constant}/#{meth}/ ?"
+            end
+          when ::Method
+            meth
+          else
+            raise InvalidArgumentError, "#{meth.inspect} must be of type Symbol, String, or Method"
+          end
 
         parameters = params_to_hash(method.parameters)
         src = method.source rescue nil
         source = if src
-                   lines = src.lines
-                   first_line = lines.first
-                   indent_amount = first_line.length - first_line.sub(/^\s*/, '').length
-                   lines.map { |l| l[indent_amount..-1] }.join
-                 end
+            lines = src.lines
+            first_line = lines.first
+            indent_amount = first_line.length - first_line.sub(/^\s*/, "").length
+            lines.map { |l| l[indent_amount..-1] }.join
+          end
         sup = method.super_method
 
         render_response(constant, method_method, {
@@ -148,11 +144,11 @@ module Qdocs
   CONST_REGEXP = /[[:upper:]]\w*(?:::[[:upper:]]\w*)*/.freeze
 
   Handler = if Object.const_defined? :ActiveRecord
-              require "qdocs/active_record"
-              Qdocs::ActiveRecord
-            else
-              Qdocs::Base
-            end
+      require "qdocs/active_record"
+      Qdocs::ActiveRecord
+    else
+      Qdocs::Base
+    end
 
   def self.lookup(input)
     case input
@@ -174,7 +170,7 @@ module Qdocs
   def self.load_env(dir_level = nil)
     check_dir = dir_level || ["."]
     project_top_level = Pathname(File.join(*check_dir, "Gemfile")).exist? ||
-      Pathname(File.join(*check_dir, ".git")).exist?
+                        Pathname(File.join(*check_dir, ".git")).exist?
     if project_top_level && Pathname(File.join(*check_dir, "config", "environment.rb")).exist?
       require File.join(*check_dir, "config", "environment.rb")
     elsif project_top_level
