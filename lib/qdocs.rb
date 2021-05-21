@@ -113,7 +113,7 @@ module Qdocs
                    rescue NameError
                      raise UnknownMethodError, "No method #{meth.inspect} for #{constant}. Did you mean #{constant}/#{meth}/ ?"
                    end
-                 when Method
+                 when ::Method
                    meth
                  else
                    raise InvalidArgumentError, "#{meth.inspect} must be of type Symbol, String, or Method"

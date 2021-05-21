@@ -62,7 +62,7 @@ module Qdocs
             klass.columns.each do |col|
               next unless col.name.to_s.match? pattern
 
-              database_attributes[name] = active_attributes_for col
+              database_attributes[col.name.to_sym] = active_record_attributes_for col
             end
           end
         end
@@ -80,10 +80,9 @@ module Qdocs
           constant = klass
         end
       rescue UnknownMethodError => e
-        p constant, meth, type
         if constant && meth && type == :instance
           if_active_record(constant) do |klass|
-            m = meth.is_a?(Method) ? (meth.name rescue nil) : meth
+            m = meth.is_a?(::Method) ? (meth.name rescue nil) : meth
             return render_response(
               klass,
               :active_record_attribute,
