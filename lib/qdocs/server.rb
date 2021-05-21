@@ -1,6 +1,5 @@
 require "rack"
-
-# TODO: find environment.rb file if it is available, and require it
+require "pathname"
 
 module Qdocs
   class Server
@@ -18,8 +17,25 @@ module Qdocs
       [500, { "Content-Type" => "text/html; charset=utf-8" }, ["Error: #{e.message}"]]
     end
   end
+
+  def self.load_env(dir_level = nil)
+    check_dir = dir_level || ["."]
+    project_top_level = Pathname(File.join(*check_dir, "Gemfile")).exist? ||
+      Pathname(File.join(*check_dir, ".git")).exist?
+    if project_top_level && Pathname(File.join(*check_dir, "config", "environment.rb")).exist?
+      require File.join(*check_dir, "config", "environment.rb")
+    elsif project_top_level
+      # no op - no env to load
+    else
+      dir_level ||= []
+      dir_level << ".."
+      Qdocs.load_env(dir_level)
+    end
+  end
+
+  load_env
 end
 
 handler = Rack::Handler::WEBrick
 
-handler.run Qdocs::Server.new
+handler.run Qdocs::Server.new, Port: 7593 # random port, not common 8080
