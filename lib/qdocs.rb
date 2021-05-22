@@ -45,6 +45,7 @@ module Qdocs
 
     def render_response(const, type, attrs)
       {
+        original_input: @original_input,
         constant: {
           name: const.name,
           type: const.class.name,
@@ -58,6 +59,10 @@ module Qdocs
   module Base
     class Const
       include Helpers
+
+      def initialize(original_input)
+        @original_input = original_input
+      end
 
       def show(const)
         const = const.to_s
@@ -76,6 +81,10 @@ module Qdocs
 
     class Method
       include Helpers
+
+      def initialize(original_input)
+        @original_input = original_input
+      end
 
       def index(const, pattern)
         constant = find_constant const
@@ -153,15 +162,15 @@ module Qdocs
   def self.lookup(input)
     case input
     when /\A([[:lower:]](?:#{METHOD_REGEXP})?)\z/
-      Handler::Method.new.show(Object, $1, :instance)
+      Handler::Method.new(input).show(Object, $1, :instance)
     when /\A(#{CONST_REGEXP})\.(#{METHOD_REGEXP})\z/
-      Handler::Method.new.show($1, $2, :singleton)
+      Handler::Method.new(input).show($1, $2, :singleton)
     when /\A(#{CONST_REGEXP})#(#{METHOD_REGEXP})\z/
-      Handler::Method.new.show($1, $2, :instance)
+      Handler::Method.new(input).show($1, $2, :instance)
     when /\A(#{CONST_REGEXP})\z/
-      Handler::Const.new.show($1)
+      Handler::Const.new(input).show($1)
     when %r{\A(#{CONST_REGEXP})/([^/]+)/\z}
-      Handler::Method.new.index($1, Regexp.new($2))
+      Handler::Method.new(input).index($1, Regexp.new($2))
     else
       raise UnknownPatternError, "Unrecognised pattern #{input}"
     end
