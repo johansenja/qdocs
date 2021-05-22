@@ -88,6 +88,12 @@ $ curl 'http://localhost:7593/?input=User%2Eemail'
 
 `$ qdocs --help` 
 
+## Editor integration
+
+Feel free to add others! 
+
+- [Vim](https://github.com/johansenja/qdocs-vim) 
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
