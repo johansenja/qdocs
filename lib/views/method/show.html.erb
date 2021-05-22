@@ -1,0 +1,56 @@
+<% attributes = @resp[:attributes] %>
+<% method_type = @resp[:query_type] == :instance_method ? "#" : "." %>
+<section>
+  <h1><a href="/?input=<%= @const_name %>"><%= @const_name %></a><%= method_type%><%= @resp.dig :attributes, :name %></h1>
+</section>
+<% source_location = @resp.dig :attributes, :source_location %>
+<% if source_location %>
+  <section>
+    <h2>Source Location</h2>
+    <p><%= source_location %></p>
+  </section>
+<% end %>
+<section>
+  <h2>Arity: <%= attributes[:arity] %></h2>
+  <p>See <a target="_blank" href="https://ruby-doc.org/core-3.0.1/Method.html#method-i-arity">the official docs</a> for reference</p>
+</section>
+<% if attributes[:parameters].length.positive? %>
+  <section>
+    <h2>Parameters</h2>
+    <p>See <a href="https://ruby-doc.org/core-3.0.1/Method.html#method-i-parameters">the official docs</a> for reference</p>
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Kind</th></tr>
+      </thead>
+      <tbody>
+        <% attributes[:parameters].each do |name, type| %>
+          <tr><td><%= name %></td><td><%= type %></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+<% end %>
+<% if attributes[:defined_at] || attributes[:comment] || attributes[:source] %>
+  <section>
+    <% if attributes[:defined_at] %>
+      <% file, line_num = attributes[:defined_at].split(":") %>
+      <h2>Defined at</h2>
+      <p><a href="file://<%= file %>" target="_blank"><%= file %></a>, line number <%= line_num %></p>
+    <% end %>
+    <% if attributes[:comment] %>
+      <h2>Comment</h2>
+      <pre><code><%= attributes[:comment] %></code></pre>
+    <% end %>
+    <% if attributes[:source] %>
+      <h2>Source</h2>
+      <pre><code><%= attributes[:source] %></code></pre>
+    <% end %>
+  </section>
+<% end %>
+<% super_method = attributes.dig :super_method, :attributes %>
+<% if super_method %>
+  <section>
+    <h2>Super method</h2>
+    <p><a href="/?input=<%= super_method[:belongs_to] %><%= CGI.escape(method_type) %><%= super_method[:name] %>"><%= super_method[:belongs_to] %> - <%= super_method[:name] %></a></p>
+  </section>
+<% end %>

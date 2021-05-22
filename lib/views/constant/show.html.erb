@@ -1,0 +1,68 @@
+<% attributes = @resp[:attributes] %>
+<section>
+  <h1><%= @const_name %>: <%= attributes[:constant_type] %></h1>
+</section>
+<% if attributes[:source_location] %>
+  <section>
+    <h2>Source Location</h2>
+    <p><%= attributes[:source_location] %></p>
+  </section>
+<% end %>
+<% if attributes[:value] %>
+  <section>
+    <h2>Constant value</h2>
+    <p><%= attributes[:value] %></p>
+  </section>
+<% end %>
+<% if attributes[:singleton_methods] && !attributes[:singleton_methods].empty? %>
+  <section>
+    <h2>Singleton Methods</h2>
+    <ul>
+      <% attributes[:singleton_methods].each do |m| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape(".")%><%= m.to_s %>"><%= m.inspect %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% if attributes[:instance_methods] && !attributes[:instance_methods].empty? %>
+  <section>
+    <h2>Instance Methods</h2>
+    <ul>
+      <% attributes[:instance_methods].each do |m| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("#")%><%= m.to_s %>"><%= m.inspect %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% if attributes[:databse_attributes] && !attributes[:database_attributes].empty? %>
+  <section>
+    <h2>Active Record columns</h2>
+    <ul>
+      <% attributes[:database_attributes].each do |col| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("#") %><%= col["name"] %>"><%= col["name"] %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% included_modules = attributes[:included_modules] %>
+<% if included_modules && !included_modules.empty? %>
+  <section>
+    <h2>Included Modules</h2>
+    <ul>
+      <% included_modules.each do |m| %>
+        <li><a href="/?input=<%= m.to_s %>"><%= m %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% constants = attributes[:constants] %>
+<% if constants && !constants.empty? %>
+  <section>
+    <h2>Constants</h2>
+    <ul>
+      <% constants.each do |c| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("::") %><%= c %>"><%= @const_name %>::<%= c %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

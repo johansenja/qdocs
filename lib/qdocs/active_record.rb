@@ -12,6 +12,7 @@ module Qdocs
           default: col.default,
           null: col.null,
           default_function: col.default_function,
+          name: col.name,
         }
       end
 
@@ -70,7 +71,13 @@ module Qdocs
         if database_attributes.empty?
           attrs
         else
-          { **attrs, database_attributes: database_attributes }
+          {
+            **attrs,
+            attributes: {
+              **attrs[:attributes],
+              database_attributes: database_attributes,
+            },
+          }
         end
       end
 

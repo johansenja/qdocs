@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>Qdocs - <%= @resp[:original_input] %></title>
+    <style>
+      html, body {
+        font-family: monospace;
+        color: black;
+        background-color: white;
+      }
+
+      code {
+        background-color: #eee;
+        color: rebeccapurple;
+        padding: 0.5em;
+        line-height: 2em
+      }
+
+      section {
+        padding: 8px;
+        border: 1px solid #333;
+        border-radius: 3px;
+        margin: 16px 0;
+      }
+
+      th {
+        border-bottom: 1px solid #333;
+      }
+
+      th, td {
+        padding: 10px 24px;
+      }
+
+      @media(prefers-color-scheme: dark) {
+        html, body {
+          background-color: #333;
+          color: #fefefe
+        }
+
+        a {
+          color: cyan;
+        }
+
+        a:visited {
+          color: magenta
+        }
+
+        code {
+          background-color: #604e49;
+          color: #c7ff83;
+        }
+
+        section {
+          border-color: #fefefe;
+        }
+
+        th {
+          border-bottom-color: #fefefe;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <%= @specific_contents %>
+  </body>
+</html>
