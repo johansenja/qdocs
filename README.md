@@ -62,24 +62,23 @@ $ qdocs 'Set#length'
 **also provides support for constants which are recognised to be ActiveRecord models:**
 
 ```
-$ curl 'http://localhost:7593/?input=User%2Femail%2F'
+$ curl 'http://localhost:7593/?input=User%2Eemail'
 {
+  "original_input": "User#id",
   "constant": {
     "name": "User",
     "type": "Class"
   },
-  "query_type": "methods",
+  "query_type": "instance_method",
   "attributes": {
-    "constant": "User",
-    "singleton_methods": [
-      "find_by_unconfirmed_email_with_errors"
-    ],
-    "instance_methods": [
-      "postpone_email_change?",
-      "postpone_email_change_until_confirmation_and_regenerate_confirmation_token",
-      "send_email_changed_notification?",
-      "send_verification_email"
-    ]
+    "defined_at": "~/.rvm/gems/ruby-2.7.1/gems/activerecord-6.0.3.6/lib/active_record/attribute_methods/primary_key.rb:18",
+    "source": "def id\n  _read_attribute(@primary_key)\nend\n",
+    "arity": 0,
+    "parameters": {},
+    "comment": "# Returns the primary key column's value.",
+    "name": "id",
+    "belongs_to": "ActiveRecord::AttributeMethods::PrimaryKey",
+    "super_method": null
   }
 }
 
