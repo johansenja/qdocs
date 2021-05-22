@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'qdocs'
+require_relative '../lib/qdocs'
 require 'json'
 
 input = ARGV[0]
@@ -12,7 +12,7 @@ case input
 when "--version", "-v", "-version"
   puts Qdocs::VERSION
 when "-s", "--server"
-  require "qdocs/server"
+  require_relative "qdocs/server"
 when "help", "--help", "-h", "", nil
   puts <<~STR
     Usage:

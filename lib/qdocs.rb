@@ -170,7 +170,7 @@ module Qdocs
   load_env
 
   Handler = if Object.const_defined? :ActiveRecord
-      require "qdocs/active_record"
+      require_relative "qdocs/active_record"
       Qdocs::ActiveRecord
     else
       Qdocs::Base
