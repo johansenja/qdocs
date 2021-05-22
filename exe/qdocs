@@ -12,7 +12,7 @@ case input
 when "--version", "-v", "-version"
   puts Qdocs::VERSION
 when "-s", "--server"
-  require_relative "qdocs/server"
+  require_relative "../lib/qdocs/server"
 when "help", "--help", "-h", "", nil
   puts <<~STR
     Usage:

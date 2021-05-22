@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    qdocs (0.2.1)
+    qdocs (0.2.2)
       method_source (~> 1)
       rack (> 1)
 
