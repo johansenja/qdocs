@@ -158,6 +158,7 @@ module Qdocs
     else
       Qdocs::Base
     end
+  p Handler
 
   def self.lookup(input)
     case input

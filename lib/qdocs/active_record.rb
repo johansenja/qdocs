@@ -76,6 +76,7 @@ module Qdocs
 
       def show(const, meth, type)
         constant = []
+        p "here"
         super do |klass|
           constant << klass
         end
