@@ -6,6 +6,8 @@ Qdocs is a very lightweight language intelligence server, which provides runtime
 - Querying a constant's instance and singleton methods by regular expression, returning the methods whose names match the given pattern
 - Providing detailed information about active record attributes, if the constant being queried is an ActiveRecord model
 
+It has minimal dependencies (probably nothing extra, if your application uses rails or another common web framework)
+
 
 ## Installation
 
