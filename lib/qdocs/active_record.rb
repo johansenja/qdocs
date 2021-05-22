@@ -43,8 +43,8 @@ module Qdocs
             type: :active_record_class,
             attributes: {
               **resp[:attributes],
-              database_attributes: database_attributes
-            }
+              database_attributes: database_attributes,
+            },
           }
         else
           resp
@@ -75,19 +75,21 @@ module Qdocs
       end
 
       def show(const, meth, type)
-        constant = nil
+        constant = []
         super do |klass|
-          constant = klass
+          constant << klass
         end
       rescue UnknownMethodError => e
-        if constant && meth && type == :instance
-          if_active_record(constant) do |klass|
+        p constant, meth, type
+        if constant[0] && meth && type == :instance
+          if_active_record(constant[0]) do |klass|
+            p klass
             m = meth.is_a?(::Method) ? (meth.name rescue nil) : meth
             return render_response(
-              klass,
-              :active_record_attribute,
-              active_record_attributes_for(klass.column_for_attribute(m))
-            )
+                     klass,
+                     :active_record_attribute,
+                     active_record_attributes_for(klass.column_for_attribute(m))
+                   )
           end
         end
 
