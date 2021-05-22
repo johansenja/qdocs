@@ -152,13 +152,29 @@ module Qdocs
   METHOD_REGEXP = /(?:[a-zA-Z_]+|\[\])[?!=]?/.freeze
   CONST_REGEXP = /[[:upper:]]\w*(?:::[[:upper:]]\w*)*/.freeze
 
+  def self.load_env(dir_level = nil)
+    check_dir = dir_level || ["."]
+    project_top_level = Pathname(File.join(*check_dir, "Gemfile")).exist? ||
+                        Pathname(File.join(*check_dir, ".git")).exist?
+    if project_top_level && Pathname(File.join(*check_dir, "config", "environment.rb")).exist?
+      require File.join(*check_dir, "config", "environment.rb")
+    elsif project_top_level
+      # no op - no env to load
+    else
+      dir_level ||= []
+      dir_level << ".."
+      Qdocs.load_env(dir_level)
+    end
+  end
+
+  load_env
+
   Handler = if Object.const_defined? :ActiveRecord
       require "qdocs/active_record"
       Qdocs::ActiveRecord
     else
       Qdocs::Base
     end
-  p Handler
 
   def self.lookup(input)
     case input
@@ -176,21 +192,4 @@ module Qdocs
       raise UnknownPatternError, "Unrecognised pattern #{input}"
     end
   end
-
-  def self.load_env(dir_level = nil)
-    check_dir = dir_level || ["."]
-    project_top_level = Pathname(File.join(*check_dir, "Gemfile")).exist? ||
-                        Pathname(File.join(*check_dir, ".git")).exist?
-    if project_top_level && Pathname(File.join(*check_dir, "config", "environment.rb")).exist?
-      require File.join(*check_dir, "config", "environment.rb")
-    elsif project_top_level
-      # no op - no env to load
-    else
-      dir_level ||= []
-      dir_level << ".."
-      Qdocs.load_env(dir_level)
-    end
-  end
-
-  load_env
 end

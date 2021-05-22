@@ -76,15 +76,12 @@ module Qdocs
 
       def show(const, meth, type)
         constant = []
-        p "here"
         super do |klass|
           constant << klass
         end
       rescue UnknownMethodError => e
-        p constant, meth, type
         if constant[0] && meth && type == :instance
           if_active_record(constant[0]) do |klass|
-            p klass
             m = meth.is_a?(::Method) ? (meth.name rescue nil) : meth
             return render_response(
                      klass,
