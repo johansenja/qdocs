@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require 'method_source'
+require "method_source"
 require_relative "qdocs/version"
+require "pathname"
 
 module Qdocs
   class UnknownClassError < StandardError; end
@@ -41,102 +42,152 @@ module Qdocs
     rescue NameError
       raise UnknownClassError, "Unknown constant #{const}"
     end
-  end
 
-  class Const
-    include Helpers
-
-    def show(const)
-      const = const.to_s
-      constant = find_constant const
-
-      const_sl = Object.const_source_location const
-
+    def render_response(const, type, attrs)
       {
-        source_location: source_location_to_str(const_sl),
-        instance_methods: own_methods(constant.instance_methods).sort,
-        singleton_methods: own_methods(constant.methods).sort,
+        original_input: @original_input,
+        constant: {
+          name: const.name,
+          type: const.class.name,
+        },
+        query_type: type,
+        attributes: attrs,
       }
     end
   end
 
-  class Method
-    include Helpers
+  module Base
+    class Const
+      include Helpers
 
-    def index(const, pattern)
-      constant = find_constant const
-      {
-        constant: constant,
-        singleton_methods: own_methods(constant.methods.grep(pattern)).sort,
-        instance_methods: own_methods(constant.instance_methods.grep(pattern)).sort,
-      }
+      def initialize(original_input)
+        @original_input = original_input
+      end
+
+      def show(const)
+        const = const.to_s
+        constant = find_constant const
+        yield constant if block_given?
+
+        const_sl = Object.const_source_location const
+
+        render_response(constant, :constant, {
+          source_location: source_location_to_str(const_sl),
+          instance_methods: own_methods(constant.instance_methods).sort,
+          singleton_methods: own_methods(constant.methods).sort,
+        })
+      end
     end
 
-    def show(const, meth, type)
-      constant = begin
-                   find_constant(const)
-                 rescue UnknownClassError
-                   abort "Unknown class #{const.inspect}"
-                 end
-      method = case meth
-               when Symbol, String
-                 method_method = case type
-                                 when :instance
-                                   :instance_method
-                                 when :singleton, :class
-                                   :method
-                                 else
-                                   raise UnknownMethodTypeError, "Unknown method type #{type}"
-                                 end
+    class Method
+      include Helpers
 
-                 begin
-                   constant.send method_method, meth
-                 rescue NameError
-                   raise UnknownMethodError, "No method #{meth.inspect} for #{constant.inspect}. Did you mean #{constant.inspect}/#{meth}/ ?"
-                 end
-               when Method
-                 meth
-               else
-                 raise InvalidArgumentError, "#{meth.inspect} must be of type Symbol, String, or Method"
-               end
+      def initialize(original_input)
+        @original_input = original_input
+      end
 
-      parameters = params_to_hash(method.parameters)
-      src = method.source rescue nil
-      source = if src
-                 lines = src.lines
-                 first_line = lines.first
-                 indent_amount = first_line.length - first_line.sub(/^\s*/, '').length
-                 lines.map { |l| l[indent_amount..-1] }.join
-               end
+      def index(const, pattern)
+        constant = find_constant const
 
-      {
-        defined_at: source_location_to_str(method.source_location),
-        source: source,
-        arity: method.arity,
-        parameters: parameters,
-        comment: (method.comment.strip rescue nil),
-        name: method.name,
-        belongs_to: method.owner,
-        super_method: method.super_method,
-      }
+        yield constant if block_given?
+
+        render_response(constant, :methods, {
+          constant: constant,
+          singleton_methods: own_methods(constant.methods.grep(pattern)).sort,
+          instance_methods: own_methods(constant.instance_methods.grep(pattern)).sort,
+        })
+      end
+
+      def show(const, meth, type)
+        constant = find_constant(const)
+
+        yield constant if block_given?
+
+        method = case meth
+          when Symbol, String
+            method_method = case type
+              when :instance
+                :instance_method
+              when :singleton, :class
+                :method
+              else
+                raise UnknownMethodTypeError, "Unknown method type #{type}"
+              end
+
+            begin
+              constant.send method_method, meth
+            rescue NameError
+              raise UnknownMethodError, "No method #{meth.inspect} for #{constant}. Did you mean #{constant}/#{meth}/ ?"
+            end
+          when ::Method
+            meth
+          else
+            raise InvalidArgumentError, "#{meth.inspect} must be of type Symbol, String, or Method"
+          end
+
+        parameters = params_to_hash(method.parameters)
+        src = method.source rescue nil
+        source = if src
+            lines = src.lines
+            first_line = lines.first
+            indent_amount = first_line.length - first_line.sub(/^\s*/, "").length
+            lines.map { |l| l[indent_amount..-1] }.join
+          end
+        sup = method.super_method
+
+        render_response(constant, method_method, {
+          defined_at: source_location_to_str(method.source_location),
+          source: source,
+          arity: method.arity,
+          parameters: parameters,
+          comment: (method.comment.strip rescue nil),
+          name: method.name,
+          belongs_to: method.owner,
+          super_method: sup ? Handler::Method.new.show(sup.owner, sup, type) : nil,
+        })
+      end
     end
   end
 
   METHOD_REGEXP = /(?:[a-zA-Z_]+|\[\])[?!=]?/.freeze
   CONST_REGEXP = /[[:upper:]]\w*(?:::[[:upper:]]\w*)*/.freeze
 
+  def self.load_env(dir_level = nil)
+    check_dir = dir_level || ["."]
+    project_top_level = Pathname(File.join(*check_dir, "Gemfile")).exist? ||
+                        Pathname(File.join(*check_dir, ".git")).exist?
+    if project_top_level && Pathname(File.join(*check_dir, "config", "environment.rb")).exist?
+      require File.join(*check_dir, "config", "environment.rb")
+    elsif project_top_level
+      # no op - no env to load
+    else
+      dir_level ||= []
+      dir_level << ".."
+      Qdocs.load_env(dir_level)
+    end
+  end
+
+  load_env
+
+  Handler = if Object.const_defined? :ActiveRecord
+      require "qdocs/active_record"
+      Qdocs::ActiveRecord
+    else
+      Qdocs::Base
+    end
+
   def self.lookup(input)
     case input
     when /\A([[:lower:]](?:#{METHOD_REGEXP})?)\z/
-      Qdocs::Method.new.show(Object, $1, :instance)
+      Handler::Method.new(input).show(Object, $1, :instance)
     when /\A(#{CONST_REGEXP})\.(#{METHOD_REGEXP})\z/
-      Qdocs::Method.new.show($1, $2, :singleton)
+      Handler::Method.new(input).show($1, $2, :singleton)
     when /\A(#{CONST_REGEXP})#(#{METHOD_REGEXP})\z/
-      Qdocs::Method.new.show($1, $2, :instance)
+      Handler::Method.new(input).show($1, $2, :instance)
     when /\A(#{CONST_REGEXP})\z/
-      Qdocs::Const.new.show($1)
+      Handler::Const.new(input).show($1)
     when %r{\A(#{CONST_REGEXP})/([^/]+)/\z}
-      Qdocs::Method.new.index($1, Regexp.new($2))
+      Handler::Method.new(input).index($1, Regexp.new($2))
     else
       raise UnknownPatternError, "Unrecognised pattern #{input}"
     end

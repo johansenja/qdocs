@@ -58,10 +58,35 @@ $ qdocs 'Set#length'
     "super_method": null
   }
 }
+```
+**also provides support for constants which are recognised to be ActiveRecord models:**
+
+```
+$ curl 'http://localhost:7593/?input=User%2Femail%2F'
+{
+  "constant": {
+    "name": "User",
+    "type": "Class"
+  },
+  "query_type": "methods",
+  "attributes": {
+    "constant": "User",
+    "singleton_methods": [
+      "find_by_unconfirmed_email_with_errors"
+    ],
+    "instance_methods": [
+      "postpone_email_change?",
+      "postpone_email_change_until_confirmation_and_regenerate_confirmation_token",
+      "send_email_changed_notification?",
+      "send_verification_email"
+    ]
+  }
+}
 
 ```
 
 #### Further usage examples:
+
 `$ qdocs --help` 
 
 ## Development
