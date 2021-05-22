@@ -1,15 +1,18 @@
 # Qdocs
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/qdocs`. To experiment with that code, run `bin/console` for an interactive prompt.
+Qdocs is a very lightweight language intelligence server, which provides runtime information about constants and methods. It currently supports:
 
-TODO: Delete this and the text above, and describe your gem
+- Providing detailed information about instance and singleton methods for Ruby constants (eg. Classes and Modules)
+- Querying a constant's instance and singleton methods by regular expression, returning the methods whose names match the given pattern
+- Providing detailed information about active record attributes, if the constant being queried is an ActiveRecord model
+
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'qdocs'
+gem 'qdocs', require: false
 ```
 
 And then execute:
@@ -22,30 +25,42 @@ Or install it yourself as:
 
 ## Usage
 
-### Example
+This gem offers CLI usage, or server usage:
+
+#### Server usage:
+`$ qdocs --server`
+
+
+`$ curl 'http://localhost:8080/?input=User%2Efind'`
+
+#### CLI usage
 
 ```
 $ qdocs 'Set#length'
 {
-  "defined_at": "~/.rvm/rubies/ruby-2.7.1/lib/ruby/2.7.0/set.rb:151",
-  "source": "def size\n  @hash.size\nend\n",
-  "arity": 0,
-  "parameters": {
+  "original_input": "Set#length",
+  "constant": {
+    "name": "Set",
+    "type": "Class"
   },
-  "comment": "# Returns the number of elements.",
-  "name": "length",
-  "belongs_to": "Set",
-  "super_method": null
+  "query_type": "instance_method",
+  "attributes": {
+    "defined_at": "/Users/josephjohansen/.rvm/rubies/ruby-2.7.1/lib/ruby/2.7.0/set.rb:151",
+    "source": "def size\n  @hash.size\nend\n",
+    "arity": 0,
+    "parameters": {
+    },
+    "comment": "# Returns the number of elements.",
+    "name": "length",
+    "belongs_to": "Set",
+    "super_method": null
+  }
 }
+
 ```
 
 #### Further usage examples:
-`$ qdocs --help`
-
-#### Server usage:
-`$ qdocs --server` or with Rails: `$ bundle exec rails runner 'require "qdocs/server"'`
-
-`$ curl 'http://localhost:8080/?input=User%2Efind'` 
+`$ qdocs --help` 
 
 ## Development
 
