@@ -82,6 +82,7 @@ module Qdocs
             included_modules: constant.included_modules,
             constants: constant.constants,
             constant_type: constant.class.name,
+            ancestors: build_inheritance_chain(constant).map(&:name),
           })
         else
           render_response(constant, :constant, {
@@ -94,6 +95,19 @@ module Qdocs
             constant_type: constant.class.name,
           })
         end
+      end
+
+      private
+
+      def build_inheritance_chain(initial)
+        chain = [initial]
+        klass = initial
+        while klass.respond_to?(:superclass)
+          sc = klass.superclass
+          chain << sc
+          klass = sc
+        end
+        chain
       end
     end
 

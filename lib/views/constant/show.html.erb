@@ -44,6 +44,17 @@
     </ul>
   </section>
 <% end %>
+<% ic = attributes[:inheritance_chain] %>
+<% if ic && !ic.empty? %>
+  <section>
+    <h2>Inheritance chain</h2>
+    <ul>
+      <% ic.each do |a| %>
+        <li><a href="/?input=<%= a.to_s %>"><%= a %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
 <% included_modules = attributes[:included_modules] %>
 <% if included_modules && !included_modules.empty? %>
   <section>

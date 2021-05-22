@@ -51,6 +51,6 @@
 <% if super_method %>
   <section>
     <h2>Super method</h2>
-    <p><a href="/?input=<%= super_method[:belongs_to] %><%= CGI.escape(method_type) %><%= super_method[:name] %>"><%= super_method[:belongs_to] %> - <%= super_method[:name] %></a></p>
+    <p><a href="/?input=<%= super_method[:belongs_to].name %><%= CGI.escape(method_type) %><%= super_method[:name] %>"><%= super_method[:belongs_to].name %> - <%= super_method[:name] %></a></p>
   </section>
 <% end %>
