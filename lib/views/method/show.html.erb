@@ -1,7 +1,7 @@
 <% attributes = @resp[:attributes] %>
 <% method_type = @resp[:query_type] == :instance_method ? "#" : "." %>
 <section>
-  <h1><a href="/?input=<%= @const_name %>"><%= @const_name %></a><%= method_type%><%= @resp.dig :attributes, :name %></h1>
+  <h1><a href="/?input=<%= @const_name %>"><%= CGI.escapeHTML(@const_name.to_s) %></a><%= method_type %><%= CGI.escapeHTML(@resp.dig(:attributes, :name).to_s) %></h1>
 </section>
 <section>
   <h2>Arity: <%= attributes[:arity] %></h2>
@@ -44,6 +44,10 @@
 <% if super_method %>
   <section>
     <h2>Super method</h2>
-    <p><a href="/?input=<%= super_method[:belongs_to].name %><%= CGI.escape(method_type) %><%= super_method[:name] %>"><%= super_method[:belongs_to].name %> - <%= super_method[:name] %></a></p>
+    <p>
+      <a href="/?input=<%= CGI.escape(super_method[:belongs_to].name.to_s) %><%= CGI.escape(method_type) %><%= super_method[:name] %>">
+        <%= CGI.escapeHTML(super_method[:belongs_to].name.to_s) %> - <%= super_method[:name] %>
+      </a>
+    </p>
   </section>
 <% end %>

@@ -1,6 +1,6 @@
 <% attributes = @resp[:attributes] %>
 <section>
-  <h1><%= @const_name %>: <%= attributes[:constant_type] %></h1>
+  <h1><%= CGI.escapeHTML(@const_name) %>: <%= attributes[:constant_type] %></h1>
 </section>
 <% if attributes[:source_location] %>
   <section>
@@ -12,7 +12,7 @@
 <% if attributes[:value] %>
   <section>
     <h2>Constant value</h2>
-    <p><%= attributes[:value] %></p>
+    <p><%= CGI.escapeHTML(attributes[:value].to_s) %></p>
   </section>
 <% end %>
 <% if attributes[:singleton_methods] && !attributes[:singleton_methods].empty? %>
@@ -62,8 +62,7 @@
     <h2>Included Modules</h2>
     <ul>
       <% included_modules.each do |m| %>
-        <% next unless m.name %>
-        <li><a href="/?input=<%= m.to_s %>"><%= m %></a></li>
+        <li><a href="/?input=<%= m.to_s %>"><%= CGI.escapeHTML(m.to_s) %></a></li>
       <% end %>
     </ul>
   </section>
@@ -74,7 +73,7 @@
     <h2>Constants</h2>
     <ul>
       <% constants.each do |c| %>
-        <li><a href="/?input=<%= @const_name %><%= CGI.escape("::") %><%= c %>"><%= @const_name %>::<%= c %></a></li>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("::") %><%= c %>"><%= CGI.escapeHTML(@const_name) %>::<%= CGI.escapeHTML(c.to_s) %></a></li>
       <% end %>
     </ul>
   </section>
