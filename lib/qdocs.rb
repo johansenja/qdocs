@@ -46,10 +46,17 @@ module Qdocs
     end
 
     def render_response(const, type, attrs)
+      const_name = if const.is_a?(Class) || const.is_a?(Module)
+          const.name
+        elsif instance_of?(Class) || const.instance_of?(Module)
+          const.inspect
+        else
+          const.to_s
+        end
       {
         original_input: @original_input,
         constant: {
-          name: const.name,
+          name: const_name,
           type: const.class.name,
         },
         query_type: type,
