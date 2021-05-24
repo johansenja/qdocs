@@ -12,11 +12,15 @@ module Qdocs
           default: col.default,
           null: col.null,
           default_function: col.default_function,
+          name: col.name,
         }
       end
 
       def if_active_record(constant)
-        if Object.const_defined?("::ActiveRecord::Base") && constant < ::ActiveRecord::Base
+        if Object.const_defined?("::ActiveRecord::Base") &&
+           constant.respond_to?(:<) &&
+           constant < ::ActiveRecord::Base &&
+           !constant.abstract_class
           yield constant
         end
       end
@@ -32,7 +36,7 @@ module Qdocs
           if_active_record(con) do |klass|
             constant = klass
             klass.columns.each do |col|
-              active_record_attributes_for col
+              database_attributes[col.name.to_sym] = active_record_attributes_for col
             end
           end
         end
@@ -70,7 +74,13 @@ module Qdocs
         if database_attributes.empty?
           attrs
         else
-          { **attrs, database_attributes: database_attributes }
+          {
+            **attrs,
+            attributes: {
+              **attrs[:attributes],
+              database_attributes: database_attributes,
+            },
+          }
         end
       end
 

@@ -1,0 +1,18 @@
+  <% attributes = @resp[:attributes] %>
+  <section>
+    <h1><a href="/?input=<%= @const_name %>"><%= @const_name %></a>#<%= attributes[:name] %></h1>
+  </section>
+  <section>
+    <dl>
+      <dt>Name</dt>
+      <dd><%= attributes[:name] %></dd>
+      <dt>Type</dt>
+      <dd><%= attributes[:type] %></dd>
+      <dt>Can be null?</dt>
+      <dd><%= attributes[:null] ? "yes" : "no" %></dd>
+      <dt>Default</dt>
+      <dd><%= attributes[:default_function] || attributes[:default] || "null" %></dd>
+      <dt>Comment</dt>
+      <dd><%= attributes[:comment] || "-" %></dd>
+    </dl>
+  </section>

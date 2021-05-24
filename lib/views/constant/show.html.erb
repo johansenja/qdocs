@@ -1,0 +1,80 @@
+<% attributes = @resp[:attributes] %>
+<section>
+  <h1><%= CGI.escapeHTML(@const_name) %>: <%= attributes[:constant_type] %></h1>
+</section>
+<% if attributes[:source_location] %>
+  <section>
+  <% file, line_num = attributes[:source_location].split(":") %>
+  <h2>Defined at</h2>
+  <p><a href="file://<%= file %>" target="_blank"><%= file %></a>, line number <%= line_num %></p>
+  </section>
+<% end %>
+<% if attributes[:value] %>
+  <section>
+    <h2>Constant value</h2>
+    <p><%= CGI.escapeHTML(attributes[:value].to_s) %></p>
+  </section>
+<% end %>
+<% if attributes[:singleton_methods] && !attributes[:singleton_methods].empty? %>
+  <section>
+    <h2>Singleton Methods</h2>
+    <ul>
+      <% attributes[:singleton_methods].each do |m| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape(".")%><%= m.to_s %>"><%= m.inspect %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% if attributes[:instance_methods] && !attributes[:instance_methods].empty? %>
+  <section>
+    <h2>Instance Methods</h2>
+    <ul>
+      <% attributes[:instance_methods].each do |m| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("#")%><%= m.to_s %>"><%= m.inspect %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% if attributes[:database_attributes] && !attributes[:database_attributes].empty? %>
+  <section>
+    <h2>Active Record columns</h2>
+    <ul>
+      <% attributes[:database_attributes].each_key do |name| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("#") %><%= name.to_s %>"><%= name.inspect %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% ic = attributes[:inheritance_chain] %>
+<% if ic && !ic.empty? %>
+  <section>
+    <h2>Inheritance chain</h2>
+    <ul>
+      <% ic.each do |a| %>
+        <li><a href="/?input=<%= a.to_s %>"><%= a %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% included_modules = attributes[:included_modules] %>
+<% if included_modules && !included_modules.empty? %>
+  <section>
+    <h2>Included Modules</h2>
+    <ul>
+      <% included_modules.each do |m| %>
+        <li><a href="/?input=<%= m.to_s %>"><%= CGI.escapeHTML(m.to_s) %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% constants = attributes[:constants] %>
+<% if constants && !constants.empty? %>
+  <section>
+    <h2>Constants</h2>
+    <ul>
+      <% constants.each do |c| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("::") %><%= c %>"><%= CGI.escapeHTML(@const_name) %>::<%= CGI.escapeHTML(c.to_s) %></a></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

@@ -13,6 +13,8 @@ module Qdocs
 
   class UnknownPatternError < StandardError; end
 
+  class InvalidArgumentError < StandardError; end
+
   module Helpers
     def source_location_to_str(source_location)
       if source_location && source_location.length == 2
@@ -44,10 +46,17 @@ module Qdocs
     end
 
     def render_response(const, type, attrs)
+      const_name = if const.is_a?(Class) || const.is_a?(Module)
+          const.name
+        elsif instance_of?(Class) || const.instance_of?(Module)
+          const.inspect
+        else
+          const.to_s
+        end
       {
         original_input: @original_input,
         constant: {
-          name: const.name,
+          name: const_name,
           type: const.class.name,
         },
         query_type: type,
@@ -71,11 +80,43 @@ module Qdocs
 
         const_sl = Object.const_source_location const
 
-        render_response(constant, :constant, {
-          source_location: source_location_to_str(const_sl),
-          instance_methods: own_methods(constant.instance_methods).sort,
-          singleton_methods: own_methods(constant.methods).sort,
-        })
+        if constant.instance_of?(Class) ||
+           constant.instance_of?(Module)
+          render_response(constant, :constant, {
+            source_location: source_location_to_str(const_sl),
+            instance_methods: own_methods(constant.instance_methods).sort,
+            singleton_methods: own_methods(constant.methods).sort,
+            included_modules: constant.included_modules,
+            constants: constant.constants,
+            constant_type: constant.class.name,
+            inheritance_chain: build_inheritance_chain(constant).map(&:name),
+          })
+        else
+          render_response(constant, :constant, {
+            source_location: source_location_to_str(const_sl),
+            instance_methods: nil,
+            singleton_methods: nil,
+            included_modules: nil,
+            constants: nil,
+            value: constant,
+            constant_type: constant.class.name,
+            inheritance_chain: nil,
+          })
+        end
+      end
+
+      private
+
+      def build_inheritance_chain(initial)
+        chain = [initial]
+        klass = initial
+        while klass.respond_to?(:superclass)
+          break unless (sc = klass.superclass)
+
+          chain << sc
+          klass = sc
+        end
+        chain
       end
     end
 
@@ -119,7 +160,7 @@ module Qdocs
             rescue NameError
               raise UnknownMethodError, "No method #{meth.inspect} for #{constant}. Did you mean #{constant}/#{meth}/ ?"
             end
-          when ::Method
+          when ::Method, UnboundMethod
             meth
           else
             raise InvalidArgumentError, "#{meth.inspect} must be of type Symbol, String, or Method"
@@ -143,7 +184,7 @@ module Qdocs
           comment: (method.comment.strip rescue nil),
           name: method.name,
           belongs_to: method.owner,
-          super_method: sup ? Handler::Method.new.show(sup.owner, sup, type) : nil,
+          super_method: sup ? Handler::Method.new(@original_input).show(sup.owner, sup, type) : nil,
         })
       end
     end
