@@ -33,7 +33,7 @@ module Qdocs
           if_active_record(con) do |klass|
             constant = klass
             klass.columns.each do |col|
-              active_record_attributes_for col
+              database_attributes[col.name.to_sym] = active_record_attributes_for col
             end
           end
         end

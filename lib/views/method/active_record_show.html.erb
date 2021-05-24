@@ -12,7 +12,7 @@
       <dd><%= attributes[:null] ? "yes" : "no" %></dd>
       <dt>Default</dt>
       <dd><%= attributes[:default_function] || attributes[:default] || "null" %></dd>
-      <dt>Default</dt>
-      <dd><%= attributes[:comment] %></dd>
+      <dt>Comment</dt>
+      <dd><%= attributes[:comment] || "-" %></dd>
     </dl>
   </section>

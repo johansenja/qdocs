@@ -39,8 +39,8 @@
   <section>
     <h2>Active Record columns</h2>
     <ul>
-      <% attributes[:database_attributes].each do |col| %>
-        <li><a href="/?input=<%= @const_name %><%= CGI.escape("#") %><%= col["name"] %>"><%= col["name"] %></a></li>
+      <% attributes[:database_attributes].each_key do |name| %>
+        <li><a href="/?input=<%= @const_name %><%= CGI.escape("#") %><%= name.to_s %>"><%= name.inspect %></a></li>
       <% end %>
     </ul>
   </section>
