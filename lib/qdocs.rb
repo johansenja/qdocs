@@ -93,6 +93,7 @@ module Qdocs
             constants: nil,
             value: constant,
             constant_type: constant.class.name,
+            inheritance_chain: nil,
           })
         end
       end

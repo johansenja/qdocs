@@ -37,6 +37,7 @@ module Qdocs
            Qdocs::UnknownPatternError => e
       [404, { "Content-Type" => "text/plain; charset=utf-8" }, ["Not found: #{e.message}"]]
     rescue => e
+      pp e.backtrace
       [500, { "Content-Type" => "text/plain; charset=utf-8" }, ["Error: #{e.message}"]]
     end
 
