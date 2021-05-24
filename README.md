@@ -27,13 +27,20 @@ Or install it yourself as:
 
 ## Usage
 
-This gem offers CLI usage, or server usage:
+This gem offers CLI usage, text editor integration, or viewing in a browser:
 
-#### Server usage:
+#### Starting a server manually:
 `$ qdocs --server`
 
 
-`$ curl 'http://localhost:8080/?input=User%2Efind'`
+`$ curl 'http://localhost:7593/?input=User%2Efind' # view JSON response`
+
+or view it in your browser, to be able to navigate through a GUI:
+
+`$ open 'http://localhost:7593/?input=User%2Efind'`
+
+<img width="1346" alt="Screenshot 2021-05-24 at 11 30 29" src="https://user-images.githubusercontent.com/43235608/119334821-771c1980-bc83-11eb-8027-af9c31338885.png">
+
 
 #### CLI usage
 
@@ -84,6 +91,10 @@ $ curl 'http://localhost:7593/?input=User%2Eemail'
 
 ```
 
+#### Editor integration
+
+See below
+
 #### Further usage examples:
 
 `$ qdocs --help` 
@@ -102,7 +113,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/qdocs.
+Bug reports and pull requests are welcome on GitHub at https://github.com/johansenja/qdocs.
 
 ## License
 
