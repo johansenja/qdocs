@@ -1,6 +1,6 @@
 # Qdocs
 
-Qdocs is a very lightweight language intelligence server, which provides runtime information about constants and methods. It currently supports:
+Qdocs is a very lightweight language intelligence server, which provides runtime information about constants and methods. Note that this is not a full-on "langauge server" implementing LSP, but a quick and lightweight way of finding information. It currently supports:
 
 - Providing detailed information about instance and singleton methods for Ruby constants (eg. Classes and Modules)
 - Querying a constant's instance and singleton methods by regular expression, returning the methods whose names match the given pattern
