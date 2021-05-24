@@ -73,8 +73,8 @@ module Qdocs
 
         const_sl = Object.const_source_location const
 
-        case constant.class
-        when Class, Module
+        if constant.instance_of?(Class) ||
+           constant.instance_of?(Module)
           render_response(constant, :constant, {
             source_location: source_location_to_str(const_sl),
             instance_methods: own_methods(constant.instance_methods).sort,
