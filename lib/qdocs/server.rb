@@ -11,22 +11,22 @@ module Qdocs
         # this is a bit ugly but ok 🤷
         format = req.env.fetch("HTTP_ACCEPT", "")
         body, content_type = case format
-                          when %r{text/html}
-                            require "erb"
-                            template = case resp[:query_type]
-                                       when :methods
-                                         "constant/show"
-                                       when :instance_method, :singleton_method, :class_method, :method
-                                         "method/show"
-                                       when :active_record_attribute
-                                         "method/active_record_show"
-                                       when :constant, :active_record_class
-                                         "constant/show"
-                                       end
-                            [render_html(resp, template), "text/html"]
-                          else
-                            [JSON.pretty_generate(resp), "application/json"]
-                          end
+          when %r{text/html}
+            require "erb"
+            template = case resp[:query_type]
+              when :methods
+                "constant/show"
+              when :instance_method, :singleton_method, :class_method, :method
+                "method/show"
+              when :active_record_attribute
+                "method/active_record_show"
+              when :constant, :active_record_class
+                "constant/show"
+              end
+            [render_html(resp, template), "text/html"]
+          else
+            [JSON.pretty_generate(resp), "application/json"]
+          end
         [200, { "Content-Type" => "#{content_type}" }, [body]]
       else
         [404, { "Content-Type" => "text/plain; charset=utf-8" }, ["Not Found"]]
@@ -37,6 +37,7 @@ module Qdocs
            Qdocs::UnknownPatternError => e
       [404, { "Content-Type" => "text/plain; charset=utf-8" }, ["Not found: #{e.message}"]]
     rescue => e
+      p e.backtrace
       [500, { "Content-Type" => "text/plain; charset=utf-8" }, ["Error: #{e.message}"]]
     end
 
